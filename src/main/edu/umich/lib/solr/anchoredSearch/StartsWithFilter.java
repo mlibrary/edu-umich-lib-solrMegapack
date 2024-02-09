@@ -9,7 +9,7 @@ import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
 
 import java.io.IOException;
 
-public class LeftAnchoredSearchFilter extends TokenFilter {
+public class StartsWithFilter extends TokenFilter {
 
     private Integer current_position = 0;
     private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
@@ -17,7 +17,7 @@ public class LeftAnchoredSearchFilter extends TokenFilter {
     private final OffsetAttribute offsetAttr = addAttribute(OffsetAttribute.class);
     private final PositionLengthAttribute posLengthAttr = addAttribute(PositionLengthAttribute.class);
 
-    protected LeftAnchoredSearchFilter(TokenStream input) {
+    protected StartsWithFilter(TokenStream input) {
         super(input);
     }
 

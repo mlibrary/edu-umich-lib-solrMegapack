@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class FullyAnchoredSearchFilter extends TokenFilter {
+public class ExactishFilter extends TokenFilter {
 
-private static final Logger LOGGER = LoggerFactory.getLogger(FullyAnchoredSearchFilter.class);
+private static final Logger LOGGER = LoggerFactory.getLogger(ExactishFilter.class);
 
   private final CharTermAttribute myTermAttribute =
     addAttribute(CharTermAttribute.class);
@@ -27,7 +27,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(FullyAnchoredSearch
   private Iterator<StatePos> statesIterator;
   private Integer last_position = -1;
 
-  protected FullyAnchoredSearchFilter(TokenStream input) {
+  protected ExactishFilter(TokenStream input) {
     super(input);
   }
 

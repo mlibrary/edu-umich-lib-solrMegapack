@@ -111,7 +111,7 @@ chain (being based on String and not TextField), hence the filter, above.
 
 ```xml
 
-<fieldType name="callnumber_sortable" class="edu.umich.lib.solr.fieldType.callnumber.solr.CallnumberSortableFieldType" />
+<fieldType name="callnumber_sortable" class="edu.umich.lib.solr.libraryIdentifier.callnumber.analysis.AnyCallNumberSimpleFilterFactory" />
 
 
 <field name="callnumber_search" type="callnumber_sortable"
