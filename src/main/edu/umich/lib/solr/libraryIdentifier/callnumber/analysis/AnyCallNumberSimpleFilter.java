@@ -35,8 +35,8 @@ public final class AnyCallNumberSimpleFilter extends TokenFilter {
    * or return nothing (default)
    */
 
-  private Boolean allowTruncated;
-  private Boolean passThroughOnError;
+  private final Boolean allowTruncated;
+  private final Boolean passThroughOnError;
 
 
   /**
