@@ -1,5 +1,6 @@
 package edu.umich.lib.solr.anchoredSearch;
 
+import edu.umich.lib.solr.pluginScaffold.analysis.SimpleFilter;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -9,7 +10,7 @@ import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
 
 import java.io.IOException;
 
-public class LeftAnchoredSearchFilter extends TokenFilter {
+public class LeftAnchoredSearchFilter extends SimpleFilter {
 
     private Integer current_position = 0;
     private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
