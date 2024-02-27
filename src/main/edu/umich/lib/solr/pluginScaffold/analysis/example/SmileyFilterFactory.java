@@ -16,6 +16,6 @@ public class SmileyFilterFactory extends SimpleFilterFactory {
   }
 
   public SmileyFilter create(TokenStream input) {
-    return new SmileyFilter(input, getEchoInvalidInput());
+    return new SmileyFilter(input, echoInvalidInput, keepOriginal);
   }
 }

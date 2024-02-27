@@ -12,11 +12,13 @@ import org.apache.lucene.analysis.TokenStream;
 
 public class SmileyFilter extends SimpleFilter {
 
-  public SmileyFilter(TokenStream aStream, Boolean echoInvalidInput) {
-    super(aStream, echoInvalidInput);
+  public SmileyFilter(TokenStream aStream) {
+    this(aStream, false, false);
   }
 
-
+  public SmileyFilter(TokenStream aStream, Boolean echoInvalid, Boolean keepOriginal) {
+    super(aStream, echoInvalid, keepOriginal);
+  }
 
   @Override
   public String munge(String str) {

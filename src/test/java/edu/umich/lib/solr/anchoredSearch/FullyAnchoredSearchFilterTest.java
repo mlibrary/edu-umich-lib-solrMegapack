@@ -1,10 +1,11 @@
 package edu.umich.lib.solr.anchoredSearch;
 
 
+import edu.umich.lib.solr.pluginScaffold.testSupport.ManualTokenStream;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -12,19 +13,12 @@ public class FullyAnchoredSearchFilterTest {
 
   @Test
   public void testNested() throws IOException {
-        ManualTokenStream ts = new ManualTokenStream();
-
-    ts.add("Bill", 1);
-    ts.add("John", 2);
-    ts.add("James", 2);
-    ts.add("Dueber", 3);
+        ManualTokenStream ts = new ManualTokenStream("Bill",
+            Arrays.asList("John", "James"),
+            "Dueber");
 
     FullyAnchoredSearchFilter ff = new FullyAnchoredSearchFilter(ts);
-    List<String[]> terms = TokenStreamTestHelpers.get_nested_terms(ff);
-    assertEquals("Bill1", terms.get(0)[0]);
-    assertEquals("John2", terms.get(1)[0]);    
-    assertEquals("James2", terms.get(1)[1]);
-    assertEquals("Dueber300", terms.get(2)[0]);
+    String terms = ff.nestedTermsAsString();
+    assertEquals("[Bill1, [John2, James2], Dueber300]", terms);
   }
-
 }

@@ -1,5 +1,6 @@
 package edu.umich.lib.solr.anchoredSearch;
 
+import edu.umich.lib.solr.pluginScaffold.testSupport.TokenStreamTestableReaders;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -12,12 +13,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class FullyAnchoredSearchFilter extends TokenFilter {
+public class FullyAnchoredSearchFilter extends TokenFilter implements TokenStreamTestableReaders {
 
-private static final Logger LOGGER = LoggerFactory.getLogger(FullyAnchoredSearchFilter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FullyAnchoredSearchFilter.class);
 
-  private final CharTermAttribute myTermAttribute =
-    addAttribute(CharTermAttribute.class);
+  private final CharTermAttribute termAttribute =
+      addAttribute(CharTermAttribute.class);
   private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
 
   private boolean setup_done = false;
@@ -25,20 +26,27 @@ private static final Logger LOGGER = LoggerFactory.getLogger(FullyAnchoredSearch
 
   private List<StatePos> states = new ArrayList<>();
   private Iterator<StatePos> statesIterator;
-  private Integer last_position = -1;
 
-  protected FullyAnchoredSearchFilter(TokenStream input) {
-    super(input);
+  public FullyAnchoredSearchFilter(TokenStream aStream) {
+    super(aStream);
+  }
+
+  public CharTermAttribute getTermAttribute() {
+    return termAttribute;
+  }
+
+  public PositionIncrementAttribute getPosIncrAtt() {
+    return posIncrAtt;
   }
 
   private void reset_class_variables() {
     maximum_position = 0;
     setup_done = false;
     states = new ArrayList<>();
-    last_position = -1;
   }
+
   // A little data class to hold a state and its computed position.
-  class StatePos {
+  static class StatePos {
     public State state;
     public Integer position;
 
@@ -76,16 +84,17 @@ private static final Logger LOGGER = LoggerFactory.getLogger(FullyAnchoredSearch
    * Takes a set of tokens and returns them with their position appended
    * to the term (so [bill, dueber] becomes [bill1, dueber200]. When used
    * with a phrase query, will only allow matches that are fully-anchored
-   *
+   * <p>
    * We deal with the positionIncrementAttribute so tokens that occupy
    * the same position ([[Bill,bill], [Dueber,dueber]) will have the
    * correct number appended.
+   *
    * @return boolean
    * @throws IOException
    */
   @Override
   public final boolean incrementToken() throws IOException {
-    if (! setup_done) {
+    if (!setup_done) {
       states = get_states();
       maximum_position = get_final_position(states);
       statesIterator = states.iterator();
@@ -97,14 +106,14 @@ private static final Logger LOGGER = LoggerFactory.getLogger(FullyAnchoredSearch
       Integer pos = sp.position;
       restoreState(sp.state);
 
-      String t = myTermAttribute.toString();
+      String t = termAttribute.toString();
       String newtok;
       if (pos == maximum_position) {
         newtok = t + pos.toString() + "00";
       } else {
         newtok = t + pos.toString();
       }
-      myTermAttribute.setEmpty().append(newtok);
+      termAttribute.setEmpty().append(newtok);
       return true;
     } else {
       reset_class_variables();

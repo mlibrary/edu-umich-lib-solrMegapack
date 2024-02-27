@@ -3,22 +3,38 @@ package edu.umich.lib.solr.pluginScaffold.analysis;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
-public class SimpleFilterFactory extends TokenFilterFactory {
-  private Boolean echoInvalidInput;
+public abstract class SimpleFilterFactory<T> extends TokenFilterFactory {
+  protected  Boolean echoInvalidInput;
+  protected  Boolean keepOriginal;
+  protected  Map<String, String> arguments;
 
-  public SimpleFilterFactory(Map<String, String> args) {
+  public SimpleFilterFactory(Map<String, String> args) throws IllegalArgumentException {
     super(args);
-    echoInvalidInput = getBoolean(args, "echoInvalidInput", false);
+    arguments = args;
+    arguments.keySet().stream().filter(key -> !validArguments().contains(key)).forEach(key -> {
+      throw new IllegalArgumentException(
+          "Key " + key
+              + " is not legal for filter class "
+              + this.getClass().toString()
+              + ". Make sure to correctly override 'public List<String> validArguments()'"
+              + " in your subclass of SimpleFilter.");
+    });
+
+    echoInvalidInput = getBoolean(arguments, "echoInvalidInput", false);
+    keepOriginal = getBoolean(arguments, "keepOriginal", false);
   }
 
-  public Boolean getEchoInvalidInput() {
-    return echoInvalidInput;
+  public List<String> validArguments() {
+    return new ArrayList<String>(Arrays.asList("echoInvalidInput", "keepOriginal"));
   }
 
-  public SimpleFilter create(TokenStream input) {
-    return new SimpleFilter(input, echoInvalidInput);
-  }
+  public abstract SimpleFilter create(TokenStream aStream);
 
 }

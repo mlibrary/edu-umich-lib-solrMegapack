@@ -1,6 +1,6 @@
 package edu.umich.lib.solr.anchoredSearch;
 
-import edu.umich.lib.solr.pluginScaffold.analysis.SimpleFilter;
+import edu.umich.lib.solr.pluginScaffold.testSupport.TokenStreamTestableReaders;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -10,11 +10,11 @@ import org.apache.lucene.analysis.tokenattributes.PositionLengthAttribute;
 
 import java.io.IOException;
 
-public class LeftAnchoredSearchFilter extends SimpleFilter {
+public class LeftAnchoredSearchFilter extends TokenFilter implements TokenStreamTestableReaders {
 
     private Integer current_position = 0;
     private final PositionIncrementAttribute posIncrAtt = addAttribute(PositionIncrementAttribute.class);
-    private final CharTermAttribute myTermAttribute = addAttribute(CharTermAttribute.class);
+    private final CharTermAttribute termAttribute = addAttribute(CharTermAttribute.class);
     private final OffsetAttribute offsetAttr = addAttribute(OffsetAttribute.class);
     private final PositionLengthAttribute posLengthAttr = addAttribute(PositionLengthAttribute.class);
 
@@ -22,7 +22,13 @@ public class LeftAnchoredSearchFilter extends SimpleFilter {
         super(input);
     }
 
+    public CharTermAttribute getTermAttribute() {
+        return termAttribute;
+    }
 
+    public PositionIncrementAttribute getPosIncrAtt() {
+        return posIncrAtt;
+    }
 
     private void reset_class_variables() {
         current_position = 0;
@@ -47,11 +53,11 @@ public class LeftAnchoredSearchFilter extends SimpleFilter {
             return false;
         }
 
-        String t = myTermAttribute.toString();
+        String t = termAttribute.toString();
         current_position += posIncrAtt.getPositionIncrement();
 
         String newtok = t + current_position.toString();
-        myTermAttribute.setEmpty().append(newtok);
+        termAttribute.setEmpty().append(newtok);
         return true;
     }
 }

@@ -1,12 +1,13 @@
 package edu.umich.lib.solr.anchoredSearch;
 
+import edu.umich.lib.solr.pluginScaffold.testSupport.ManualTokenStream;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class LeftAnchoredSearchFilterTest {
@@ -14,33 +15,20 @@ public class LeftAnchoredSearchFilterTest {
 
   @Test
   public void testOneToken() throws IOException {
-    ManualTokenStream ts = new ManualTokenStream();
-    ts.add("Bill", 1);
+    ManualTokenStream ts = new ManualTokenStream("Bill");
 
     LeftAnchoredSearchFilter lasf = new LeftAnchoredSearchFilter(ts);
-    assertArrayEquals(new String[]{"Bill1"}, TokenStreamTestHelpers.get_nested_terms(lasf).get(0));
+    assertEquals(Collections.singletonList("Bill1"), lasf.nestedTerms().get(0));
   }
 
   @Test
   public void testNested() throws IOException {
-    ManualTokenStream ts = new ManualTokenStream();
-    ts.add("Bill", 1);
-    ts.add("John", 2);
-    ts.add("James", 2);
-    ts.add("Dueber", 3);
+    ManualTokenStream ts = new ManualTokenStream("Bill", Arrays.asList("John", "James"), "Dueber");
 
-
-    ArrayList<String[]> expected = new ArrayList<>();
-    expected.add(new String[]{"Bill1"});
-    expected.add(new String[]{"John2", "James2"});
-    expected.add(new String[]{"Dueber3"});
-
+    String expected = "[Bill1, [John2, James2], Dueber3]";
     LeftAnchoredSearchFilter lasf = new LeftAnchoredSearchFilter(ts);
-    List<String[]> terms = TokenStreamTestHelpers.get_nested_terms(lasf);
-
-    for (int i = 0; i < expected.size(); i++) {
-      assertArrayEquals(expected.get(i), terms.get(i));
-    }
+    String terms = lasf.nestedTermsAsString();
+    assertEquals(expected, terms);
   }
 
 }
