@@ -91,9 +91,6 @@ public class SimpleFilter extends TokenFilter implements TokenStreamTestableRead
    */
   @Override
   public final boolean incrementToken() throws IOException {
-    if (!input.incrementToken()) return false;
-    if (keywordAttr.isKeyword()) return true;
-
     // If the previously-eaten token saved the state, we restore to when
     // the original string was in there and put it at the same position
 
@@ -106,26 +103,36 @@ public class SimpleFilter extends TokenFilter implements TokenStreamTestableRead
       posIncrAtt.setPositionIncrement(0);
       return true;
     }
+
+    if (!input.incrementToken()) return false;
+    if (keywordAttr.isKeyword()) return true;
+
+
     // Otherwise, munge the current token
     AttributeSource.State state = captureState(); // Capture the state with the un-munged token
     String t = termAttribute.toString(); // munge it and save
     String newStr = munge(t);
 
-    // If it's all good keep it
-    if (newStr != null) {
+    // If newStr is neither null nor the same string (unchanged), keep it
+    if (!((newStr == null) || (newStr.equals(t)))) {
       termAttribute.setEmpty();
       termAttribute.append(newStr);
     }
 
-    // If newStr is null, we need to decide if we're going to emit it anyway
-    if ((newStr == null && echoInvalidInput) || keepOriginal) {
-      savedTokenState = state; // reset to when the token was the original string and send it around again`
+    if (emitOriginal(t, newStr)) {
+      savedTokenState = state;
     } else {
       savedTokenState = null;
     }
-
     // Regardless, return true to say we're done with this one.
     return true;
+  }
+
+  private Boolean emitOriginal(String originalStr, String mungedStr) {
+    if (originalStr.equals(mungedStr)) return false;
+    if (echoInvalidInput && (mungedStr == null)) return true;
+    if (keepOriginal) return true;
+    return false;
   }
 
 

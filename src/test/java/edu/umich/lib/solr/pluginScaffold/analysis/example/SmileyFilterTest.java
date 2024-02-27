@@ -13,8 +13,15 @@ class SmileyFilterTest {
   @Test
   public void testNoKeep() throws IOException {
     ManualTokenStream ts = new ManualTokenStream("hello", "there");
-    SmileyFilter sm = new SmileyFilter(ts, false, true);
+    SmileyFilter sm = new SmileyFilter(ts, false, false);
     assertEquals("[hell😀, there]", sm.nestedTermsAsString());
+  }
+
+  @Test
+  public void testKeep() throws IOException {
+    ManualTokenStream ts = new ManualTokenStream("hello", "there");
+    SmileyFilter sm = new SmileyFilter(ts, false, true);
+    assertEquals("[[hell😀, hello], there]", sm.nestedTermsAsString());
   }
 
 }
